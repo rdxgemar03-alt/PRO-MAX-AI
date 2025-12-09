@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<title>AI Photo & Video Enhance App</title>
+<style>
+    body { background:#111; color:#fff; font-family:Arial; text-align:center; padding:20px; }
+    button { padding:12px 20px; margin:10px; border:none; border-radius:8px; font-size:16px; cursor:pointer; }
+    input { margin:10px; }
+    .box { background:#222; padding:20px; border-radius:12px; margin-top:20px; }
+</style>
+</head>
+<body>
+
+<h1>🔥 AI Photo & Video Enhance Tool</h1>
+<p>সব কিছু এক কোডেই — Replicate API Ready</p>
+
+<div class="box">
+    <h3>📤 ফাইল আপলোড করুন</h3>
+    <input type="file" id="fileInput" />
+</div>
+
+<div class="box">
+    <h3>✨ AI Tools</h3>
+
+    <button onclick="runModel('background-removal')">🟦 Background Remove</button>
+    <button onclick="runModel('4k-upscale')">🟩 4K Upscale (Real-ESRGAN)</button>
+    <button onclick="runModel('noise-reduction')">🟨 Noise Reduction</button>
+    <button onclick="runModel('face-beauty')">💖 Face Beauty Mode</button>
+    <button onclick="runModel('video-stabilize')">🎥 Video Stabilizer</button>
+    <button onclick="runModel('audio-clean')">🎧 Audio Noise Clean</button>
+    <button onclick="runModel('voice-enhance')">🎤 Voice Enhance</button>
+    <button onclick="runModel('speed-control')">⏳ Speed Change (0.10x – 4x)</button>
+
+</div>
+
+<div class="box">
+    <h3>⬇ Download</h3>
+    <a id="downloadLink" style="color:#0f0"></a>
+</div>
+
+<script>
+const API_KEY = "r8_0jJC2IfHa4FFzmtuuPEmSJnDLG50HRu1QFCU7"; // এখানে নিজের Key বসাবে
+
+async function runModel(type) {
+    const file = document.getElementById("fileInput").files[0];
+    if (!file) return alert("ফাইল দিন!");
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+        let model = "";
+
+        if (type === "background-removal") model = "cjwbwbg/background-removal";
+        if (type === "4k-upscale") model = "xinntao/real-esrgan";
+        if (type === "noise-reduction") model = "ai-forever/NoiseSuppression";
+        if (type === "face-beauty") model = "wangyifan/face-beauty";
+        if (type === "video-stabilize") model = "zsxkib/video-stabilization";
+        if (type === "audio-clean") model = "facebookresearch/denoiser";
+        if (type === "voice-enhance") model = "tencentarc/voicefixer";
+        if (type === "speed-control") model = "ffmpeg/speed-change";
+
+        alert(type + " Running…");
+
+        const response = await fetch("https://api.replicate.com/v1/predictions", {
+            method: "POST",
+            headers: {
+                "Authorization": "Token " + API_KEY,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                version: model,
+                input: { file: reader.result }
+            })
+        });
+
+        const result = await response.json();
+        const output = result?.output;
+
+        if (output) {
+            document.getElementById("downloadLink").innerHTML =
+                `<a href="${output}" download>Download Result</a>`;
+        } else {
+            alert("Error! Check API Key.");
+        }
+    };
+
+    reader.readAsDataURL(file);
+}
+</script>
+
+</body>
+</html>
